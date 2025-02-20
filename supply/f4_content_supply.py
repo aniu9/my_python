@@ -591,10 +591,13 @@ def businessCode():
 
 if __name__ == "__main__":
     try:
+        response = requests.get('https://api.ipify.org', timeout=5)
+        sendMsg(f"{datetime.now()},import start\nip:{response.text}")
         while True:
             businessCode()
     except Exception as e:
         print(f"businessCode error: {e}")
+
     # file_path = os.path.join(os.path.dirname(__file__), 'f2_msg_url.csv')
     # df = pd.read_csv(file_path, header=None)
     # urls = df.iloc[:, 0].tolist()  # 读取第一列的URL

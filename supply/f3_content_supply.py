@@ -328,8 +328,8 @@ def sign(app_key, timestamp, request_body):
         return None
 
 def reqAPi(url, data):
-    # url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800" + url
-    url = "http://ae9ba23eabeab4a89872f81144513b5b-eaed88159c98b52e.elb.ap-southeast-1.amazonaws.com:8800" + url
+    url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800" + url
+    # url = "http://ae9ba23eabeab4a89872f81144513b5b-eaed88159c98b52e.elb.ap-southeast-1.amazonaws.com:8800" + url
     now = datetime.now()
     # 将 datetime 对象转换为时间戳
     timestamp = int(now.timestamp() * 1000)
@@ -602,6 +602,8 @@ def businessCode():
 
 if __name__ == "__main__":
     try:
+        response = requests.get('https://api.ipify.org', timeout=5)
+        sendMsg(f"{datetime.now()},supply start\nip:{response.text}")
         while True:
             businessCode()
     except Exception as e:
