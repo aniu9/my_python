@@ -609,6 +609,13 @@ def csv_import(source):
     # importGroup()
     # updatePromot(startTime)
 
+def sendMsg(msg):
+    API_ID = '26534384'
+    API_HASH = '8c32b586b4c83b04b9ab7d50c6464907'
+    BOT_TOKEN = '7931792484:AAEX1QM7483FqCpcRvwFBEdbr2_Hb6uWp5s'
+    client = Client('myapp', API_ID, API_HASH, bot_token=BOT_TOKEN)
+    with client:
+        client.send_message("cjaniu", msg)
 
 if __name__ == "__main__":
     # 创建表（如果不存在）
@@ -642,11 +649,6 @@ if __name__ == "__main__":
     excel_import(datetime.now().strftime("%Y%m%d"), 2, 6)
     print(f"{datetime.now()},wait...")
 
-    API_ID = '26534384'
-    API_HASH = '8c32b586b4c83b04b9ab7d50c6464907'
-    BOT_TOKEN = '7931792484:AAEX1QM7483FqCpcRvwFBEdbr2_Hb6uWp5s'
-    client = Client('myapp', API_ID, API_HASH, bot_token=BOT_TOKEN)
     response = requests.get('https://api.ipify.org', timeout=5)
-    with client:
-        client.send_message(5380352615, f"{datetime.now()},[ **cg end** ],ip:{response.text}", parse_mode=ParseMode.DEFAULT)
+    sendMsg(f"{datetime.now()},[ **valid end** ],ip:{response.text}")
     # parse_mode = HTML parse_mode = Markdown

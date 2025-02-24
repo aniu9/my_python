@@ -587,7 +587,7 @@ def businessCode():
         time.sleep(600)
     else:
         response = requests.get('https://api.ipify.org', timeout=5)
-        sendMsg(f"{datetime.now()},import end\nip:{response.text}, group count:{emptyCnt}")
+        sendMsg(f"{datetime.now()},import end\nip:{response.text}, emptyLink count:{emptyCnt}")
 
 if __name__ == "__main__":
     try:

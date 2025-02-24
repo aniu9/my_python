@@ -6,12 +6,12 @@ from datetime import datetime, timedelta
 import requests
 from pyrogram import Client, errors
 
-# 166 cobb923 阿牛
+# 166 aniu923 阿牛
 api_id = '26534384'
 api_hash = '8c32b586b4c83b04b9ab7d50c6464907'
-# cjss_my_bot 超级阿牛 chaojianiu
-bot_token = '7781291686:AAH3L0XGwzkhtJvyeJzhC-Dy2D71NVu-a3k'
-user_id = '5380352615'
+
+bot_token = '7931792484:AAEX1QM7483FqCpcRvwFBEdbr2_Hb6uWp5s'
+token_name = 'fq_collect_bot'
 
 def getBot():
     bot = Client('my_bot', api_id=api_id, api_hash=api_hash, bot_token=bot_token)
@@ -108,10 +108,10 @@ async def get_group_info(chat_id):
 #     url = getData(10)
 
 async def get_group_msg(chat_id):
-    api_id = '22019167'
-    api_hash = '69e29ef1d74a7400f638bd481e8ea084'
-    bot_token = '8096915404:AAHcnrQqmgNYEr8r0OVij5X7dGFcGOwxlaM'
-    token_name = 'cjss_test01_bot'
+    # api_id = '22019167'
+    # api_hash = '69e29ef1d74a7400f638bd481e8ea084'
+    # bot_token = '8096915404:AAHcnrQqmgNYEr8r0OVij5X7dGFcGOwxlaM'
+    # token_name = 'cjss_test01_bot'
     bot = Client(token_name, api_id=api_id, api_hash=api_hash, bot_token=bot_token)
     async with bot as client:
         # 获取历史消息
@@ -170,10 +170,10 @@ async def get_group_msg(chat_id):
 # async def get_msg_info():
 
 async def get_me():
-    api_id = '22019167'
-    api_hash = '69e29ef1d74a7400f638bd481e8ea084'
-    bot_token = '8096915404:AAHcnrQqmgNYEr8r0OVij5X7dGFcGOwxlaM'
-    token_name = 'cjss_test01_bot'
+    # api_id = '22019167'
+    # api_hash = '69e29ef1d74a7400f638bd481e8ea084'
+    # bot_token = '8096915404:AAHcnrQqmgNYEr8r0OVij5X7dGFcGOwxlaM'
+    # token_name = 'cjss_test01_bot'
     bot = Client(token_name, api_id=api_id, api_hash=api_hash, bot_token=bot_token)
     async with bot as client:
         print(await client.get_me())
@@ -187,4 +187,5 @@ def sendMsg(msg):
         client.send_message("cjaniu", msg)
 
 if __name__ == "__main__":
-    asyncio.run(get_group_info(-1002248854833))
+    # asyncio.run(get_group_info(-1002248854833))
+    asyncio.run(get_me())
