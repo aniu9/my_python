@@ -229,7 +229,7 @@ def query_delete_data(lstData):
 
 def updateGroup(lstData):
     # url = "http://localhost:8080/cms/test/supplyGroupInfo"
-    url = "/cms-service/cms/content/supplyGroupInfo"
+    url = "cms/content/supplyGroupInfo"
     headers = {
         "appKey": "90b0e5c2eb0d11eeba8ee49d6628936c",
         "Content-Type": "application/json"
@@ -328,23 +328,22 @@ def sign(app_key, timestamp, request_body):
         return None
 
 def reqAPi(url, data):
-    url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800" + url
-    # url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800" + url.replace("/cms-service", "")
-    now = datetime.now()
-    # 将 datetime 对象转换为时间戳
-    timestamp = int(now.timestamp() * 1000)
-    j = json.dumps(data)
-    SERVER_APP_KEY = "1"
-    s = sign(str(SERVER_APP_KEY), timestamp, j)
-    headers = {
-        'Content-Type': 'application/json',
-        "appkey": str(SERVER_APP_KEY),
-        "timestamp": str(timestamp),
-        "sign": s
-    }
+    url = url.strip("/")
+    headers = {'Content-Type': 'application/json'}
+    url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/" + url
+    # url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/" + url
+    # now = datetime.now()
+    # timestamp = int(now.timestamp() * 1000)
+    # j = json.dumps(data)
+    # SERVER_APP_KEY = "1"
+    # s = sign(str(SERVER_APP_KEY), timestamp, j)
+    # headers = {
+    #     'Content-Type': 'application/json',
+    #     "appkey": str(SERVER_APP_KEY),
+    #     "timestamp": str(timestamp),
+    #     "sign": s
+    # }
 
-    # url = "http://a5b684db7f9d746b18f60bbe60781a74-8b898802e7cba134.elb.ap-southeast-1.amazonaws.com:8800/cms/content/getSupplyGroups"
-    # url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/cms/content/getSupplyGroups"
     try:
         response = requests.post(url, headers=headers, json=data, timeout=30)
         if response.status_code != 200:
@@ -359,7 +358,7 @@ def reqAPi(url, data):
         return []
 
 def getData(size):
-    url = "/cms-service/cms/content/getSupplyGroups"
+    url = "cms/content/getSupplyGroups"
     data = {"size": size}
     lst_data = reqAPi(url, data)
     urls = []
@@ -388,7 +387,7 @@ def api_import_msg(i, size):
     return len(urls)
 
 def get_data_msg(size):
-    url = "/cms-service/cms/content/getSupplyMsgs"
+    url = "cms/content/getSupplyMsgs"
     data = {"size": size}
     lst_data = reqAPi(url, data)
     urls = []
@@ -401,7 +400,7 @@ def get_data_msg(size):
 
 def update_msg(lstData):
     # url = "http://localhost:8080/cms/content/supplyMsgInfo"
-    url = "/cms-service/cms/content/supplyMsgInfo"
+    url = "cms/content/supplyMsgInfo"
     headers = {
         "appKey": "90b0e5c2eb0d11eeba8ee49d6628936c",
         "Content-Type": "application/json"
@@ -484,7 +483,7 @@ def sendMsg(msg):
         client.send_message("cjaniu", msg)
 
 def getEmptyData(size):
-    url = "/cms-service/cms/content/getEmptyLinks"
+    url = "cms/content/getEmptyLinks"
     data = {"pageSize": size}
     lst_data = reqAPi(url, data)
     urls = []
@@ -497,7 +496,7 @@ def getEmptyData(size):
 
 def updateEmpty(lstData):
     # url = "http://localhost:8080/cms/test/supplyGroupInfo"
-    url = "/cms-service/cms/content/collectGroupInfo"
+    url = "cms/content/collectGroupInfo"
     # 查询数据
     data_link = query_telegram_data(lstData)
     data_del = query_delete_data(lstData)
