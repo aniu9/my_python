@@ -44,9 +44,11 @@ def sign(app_key, timestamp, request_body):
         return None
 
 def reqAPi(url, data):
-    url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800" + url
+    url = url.strip("/")
+    # headers = {'Content-Type': 'application/json'}
+    # url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/" + url
+    url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/" + url
     now = datetime.now()
-    # 将 datetime 对象转换为时间戳
     timestamp = int(now.timestamp() * 1000)
     j = json.dumps(data)
     SERVER_APP_KEY = "1"
@@ -58,8 +60,6 @@ def reqAPi(url, data):
         "sign": s
     }
 
-    # url = "http://a5b684db7f9d746b18f60bbe60781a74-8b898802e7cba134.elb.ap-southeast-1.amazonaws.com:8800/cms/content/getSupplyGroups"
-    # url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/cms/content/getSupplyGroups"
     try:
         response = requests.post(url, headers=headers, json=data, timeout=30)
         if response.status_code != 200:
@@ -74,7 +74,7 @@ def reqAPi(url, data):
         return []
 
 def getData(size):
-    url = "/cms-service/cms/content/getSupplyGroups"
+    url = "cms/content/getSupplyGroups"
     data = {"size": size}
     lst_data = reqAPi(url, data)
     urls = []
