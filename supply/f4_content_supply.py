@@ -329,20 +329,20 @@ def sign(app_key, timestamp, request_body):
 
 def reqAPi(url, data):
     url = url.strip("/")
-    headers = {'Content-Type': 'application/json'}
-    url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/" + url
-    # url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/" + url
-    # now = datetime.now()
-    # timestamp = int(now.timestamp() * 1000)
-    # j = json.dumps(data)
-    # SERVER_APP_KEY = "1"
-    # s = sign(str(SERVER_APP_KEY), timestamp, j)
-    # headers = {
-    #     'Content-Type': 'application/json',
-    #     "appkey": str(SERVER_APP_KEY),
-    #     "timestamp": str(timestamp),
-    #     "sign": s
-    # }
+    # headers = {'Content-Type': 'application/json'}
+    # url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/" + url
+    url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/" + url
+    now = datetime.now()
+    timestamp = int(now.timestamp() * 1000)
+    j = json.dumps(data)
+    SERVER_APP_KEY = "1"
+    s = sign(str(SERVER_APP_KEY), timestamp, j)
+    headers = {
+        'Content-Type': 'application/json',
+        "appkey": str(SERVER_APP_KEY),
+        "timestamp": str(timestamp),
+        "sign": s
+    }
 
     try:
         response = requests.post(url, headers=headers, json=data, timeout=30)
