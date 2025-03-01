@@ -7,20 +7,13 @@ import requests
 from pyrogram import Client, errors
 
 # 166 aniu923 阿牛
-api_id = '26534384'
-api_hash = '8c32b586b4c83b04b9ab7d50c6464907'
+API_ID = '26534384'
+API_HASH = '8c32b586b4c83b04b9ab7d50c6464907'
 
-bot_token = '7931792484:AAEX1QM7483FqCpcRvwFBEdbr2_Hb6uWp5s'
-token_name = 'fq_collect_bot'
+TOKEN_NAME = 'fq_collect_bot'
+BOT_TOKEN = '7931792484:AAEX1QM7483FqCpcRvwFBEdbr2_Hb6uWp5s'
 
-def getBot():
-    bot = Client('my_bot', api_id=api_id, api_hash=api_hash, bot_token=bot_token)
-    return bot
-
-def getApp():
-    client = Client('my_app', api_id, api_hash)
-    return client
-
+# 后端服务请求
 def md5_hash(input_str):
     md5 = hashlib.md5()
     # Ensure the string is encoded to bytes before hashing
@@ -43,7 +36,7 @@ def sign(app_key, timestamp, request_body):
         print(f"生成签名异常: {e}")
         return None
 
-def reqAPi(url, data):
+def req_api(url, data):
     url = url.strip("/")
     # headers = {'Content-Type': 'application/json'}
     # url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/" + url
@@ -51,11 +44,11 @@ def reqAPi(url, data):
     now = datetime.now()
     timestamp = int(now.timestamp() * 1000)
     j = json.dumps(data)
-    SERVER_APP_KEY = "1"
-    s = sign(str(SERVER_APP_KEY), timestamp, j)
+    server_app_key = "1"
+    s = sign(str(server_app_key), timestamp, j)
     headers = {
         'Content-Type': 'application/json',
-        "appkey": str(SERVER_APP_KEY),
+        "appkey": str(server_app_key),
         "timestamp": str(timestamp),
         "sign": s
     }
@@ -73,22 +66,38 @@ def reqAPi(url, data):
     except:
         return []
 
-def getData(size):
+def get_to_data(size):
     url = "cms/content/getSupplyGroups"
     data = {"size": size}
-    lst_data = reqAPi(url, data)
+    lst_data = req_api(url, data)
     urls = []
     for data in lst_data:
         urls.append(data["url"])
     return urls
+
+# 机器人api
+def get_bot(token_name=None, api_id=None, api_hash=None, bot_token=None):
+    token_name = "my_bot" if token_name is None else token_name
+    api_id = API_ID if api_id is None else api_id
+    api_hash = API_HASH if api_hash is None else api_hash
+    bot_token = BOT_TOKEN if bot_token is None else bot_token
+    bot = Client(token_name, api_id=api_id, api_hash=api_hash, bot_token=bot_token)
+    return bot
+
+def get_app(token_name=None, api_id=None, api_hash=None):
+    token_name = "my_app" if token_name is None else token_name
+    api_id = API_ID if api_id is None else api_id
+    api_hash = API_HASH if api_hash is None else api_hash
+    client = Client(token_name, api_id, api_hash)
+    return client
 
 async def get_me_info(client):
     async with client as cl:
         chat = await cl.get_me()
         print(chat)
 
-async def get_group_info(chat_id):
-    async with getBot() as bot:
+async def get_chat_info(chat_id):
+    async with get_bot() as bot:
         print(f"{datetime.now()}")
         try:
             chat = await bot.get_chat(chat_id)
@@ -100,20 +109,16 @@ async def get_group_info(chat_id):
         except errors.FloodWait as e:
             print(f"Rate limit exceeded. Waiting for {e.x} seconds.")
             await asyncio.sleep(e.x)
-            return await get_group_info(chat_id)
+            return await get_chat_info(chat_id)
         except Exception as e:
             print(f"Failed to get chat info for {chat_id}: {e}")
 
-# def update_group_info():
-#     url = getData(10)
-
-async def get_group_msg(chat_id):
+async def get_chat_history(chat_id):
     # api_id = '22019167'
     # api_hash = '69e29ef1d74a7400f638bd481e8ea084'
     # bot_token = '8096915404:AAHcnrQqmgNYEr8r0OVij5X7dGFcGOwxlaM'
     # token_name = 'cjss_test01_bot'
-    bot = Client(token_name, api_id=api_id, api_hash=api_hash, bot_token=bot_token)
-    async with bot as client:
+    async with get_app() as client:
         # 获取历史消息
         flag = True
         while True:
@@ -169,23 +174,14 @@ async def get_group_msg(chat_id):
 
 # async def get_msg_info():
 
-async def get_me():
-    # api_id = '22019167'
-    # api_hash = '69e29ef1d74a7400f638bd481e8ea084'
-    # bot_token = '8096915404:AAHcnrQqmgNYEr8r0OVij5X7dGFcGOwxlaM'
-    # token_name = 'cjss_test01_bot'
-    bot = Client(token_name, api_id=api_id, api_hash=api_hash, bot_token=bot_token)
-    async with bot as client:
-        print(await client.get_me())
 
-def sendMsg(msg):
-    API_ID = '26534384'
-    API_HASH = '8c32b586b4c83b04b9ab7d50c6464907'
-    BOT_TOKEN = '7931792484:AAEX1QM7483FqCpcRvwFBEdbr2_Hb6uWp5s'
-    client = Client('myapp', API_ID, API_HASH, bot_token=BOT_TOKEN)
-    with client:
-        client.send_message("cjaniu", msg)
+def send_msg(msg):
+    # api_id = '26534384'
+    # api_hash = '8c32b586b4c83b04b9ab7d50c6464907'
+    # bot_token = '7931792484:AAEX1QM7483FqCpcRvwFBEdbr2_Hb6uWp5s'
+    with get_bot() as bot:
+        bot.send_message("cjaniu", msg)
 
 if __name__ == "__main__":
     # asyncio.run(get_group_info(-1002248854833))
-    asyncio.run(get_me())
+    asyncio.run(get_chat_history('testan03'))
