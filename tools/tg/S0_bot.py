@@ -14,10 +14,9 @@ api_id = '26534384'
 api_hash = '8c32b586b4c83b04b9ab7d50c6464907'
 bot_token = '7931792484:AAEX1QM7483FqCpcRvwFBEdbr2_Hb6uWp5s'
 
-# 中文搜索机器人
-# bot_token = '7047022058:AAFG91BlbMmLlC4x4UevEe_TEax4jNdsaYU'
-# chaojiAdmin_bot
-# bot_token = '7312534721:AAEA-EzWGnpwHsMmWI4pk6R2oxU8Rf1xUrw'
+# 中文搜索机器人 '7047022058:AAFG91BlbMmLlC4x4UevEe_TEax4jNdsaYU'
+# chaojiAdmin_bot '7312534721:AAEA-EzWGnpwHsMmWI4pk6R2oxU8Rf1xUrw'
+# CJSS_AlarmBot 6854483464:AAEAIZoirC7URAVajssHby4ZHzox9EduPIM
 
 # chaojianiu 超级阿牛
 # cjss_my_bot 7480786871:AAGocBV8ne1jli8HXzlC931rIj1CunpUhgg
