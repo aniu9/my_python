@@ -255,7 +255,7 @@ def updateGroup(lstData):
             #     data_list = []
         if len(data_list) > 0:
             # response = requests.post(url, headers=headers, json=data_list)
-            response = reqAPi(url, data_list)
+            response = req_api(url, data_list)
             print(f"{datetime.now()},下架count:{count}")
             data_list = []
 
@@ -287,7 +287,7 @@ def updateGroup(lstData):
             #     size = 0
         if size > 0:
             # requests.post(url, headers=headers, json=data_list)
-            response = reqAPi(url, data_list)
+            response = req_api(url, data_list)
 
         # url = "http://a7a4a32172a574102a42076ffca608eb-7ff1940d50a42959.elb.ap-southeast-1.amazonaws.com:8800/rule/test/batchPullData"
         # json_param = {
@@ -327,11 +327,13 @@ def sign(app_key, timestamp, request_body):
         print(f"生成签名异常: {e}")
         return None
 
-def reqAPi(url, data):
-    url = url.strip("/")
-    # headers = {'Content-Type': 'application/json'}
-    # url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/" + url
-    url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/" + url
+def req_api(api, data):
+    # 正式环境
+    url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/"
+    # 测试环境
+    # url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/"
+
+    url = url + api.strip("/")
     now = datetime.now()
     timestamp = int(now.timestamp() * 1000)
     j = json.dumps(data)
@@ -360,7 +362,7 @@ def reqAPi(url, data):
 def getData(size):
     url = "cms/content/getSupplyGroups"
     data = {"size": size}
-    lst_data = reqAPi(url, data)
+    lst_data = req_api(url, data)
     urls = []
     for data in lst_data:
         urls.append(data["url"])
@@ -389,7 +391,7 @@ def api_import_msg(i, size):
 def get_data_msg(size):
     url = "cms/content/getSupplyMsgs"
     data = {"size": size}
-    lst_data = reqAPi(url, data)
+    lst_data = req_api(url, data)
     urls = []
     for data in lst_data:
         urls.append(data["url"])
@@ -425,7 +427,7 @@ def update_msg(lstData):
             #     data_list = []
         if len(data_list) > 0:
             # response = requests.post(url, headers=headers, json=data_list)
-            response = reqAPi(url, data_list)
+            response = req_api(url, data_list)
             print(f"{datetime.now()},下架count:{count}")
             data_list = []
     count = 0
@@ -444,7 +446,7 @@ def update_msg(lstData):
             #     data_list = []
         if len(data_list) > 0:
             # response = requests.post(url, headers=headers, json=data_list)
-            response = reqAPi(url, data_list)
+            response = req_api(url, data_list)
             print(f"{datetime.now()},更新count:{count}")
             data_list = []
     print(f"无效数据：{len(data_del)} 条.")
@@ -485,7 +487,7 @@ def sendMsg(msg):
 def getEmptyData(size):
     url = "cms/content/getEmptyLinks"
     data = {"pageSize": size}
-    lst_data = reqAPi(url, data)
+    lst_data = req_api(url, data)
     urls = []
     for data in lst_data:
         urls.append(data["url"])
@@ -518,7 +520,7 @@ def updateEmpty(lstData):
             #     data_list = []
         if len(data_list) > 0:
             # response = requests.post(url, headers=headers, json=data_list)
-            response = reqAPi(url, data_list)
+            response = req_api(url, data_list)
             print(f"{datetime.now()},无效count:{count}")
             data_list = []
 
@@ -547,7 +549,7 @@ def updateEmpty(lstData):
             #     size = 0
         if size > 0:
             # requests.post(url, headers=headers, json=data_list)
-            response = reqAPi(url, data_list)
+            response = req_api(url, data_list)
 
         # url = "http://a7a4a32172a574102a42076ffca608eb-7ff1940d50a42959.elb.ap-southeast-1.amazonaws.com:8800/rule/test/batchPullData"
         # json_param = {

@@ -36,11 +36,13 @@ def sign(app_key, timestamp, request_body):
         print(f"生成签名异常: {e}")
         return None
 
-def req_api(url, data):
-    url = url.strip("/")
-    # headers = {'Content-Type': 'application/json'}
-    # url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/" + url
-    url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/" + url
+def req_api(api, data):
+    # 正式环境
+    url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/"
+    # 测试环境
+    # url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/"
+
+    url = url + api.strip("/")
     now = datetime.now()
     timestamp = int(now.timestamp() * 1000)
     j = json.dumps(data)
