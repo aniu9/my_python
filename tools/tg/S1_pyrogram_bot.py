@@ -185,5 +185,5 @@ def send_msg(msg):
         bot.send_message("cjaniu", msg)
 
 if __name__ == "__main__":
-    # asyncio.run(get_group_info(-1002248854833))
-    asyncio.run(get_chat_history('testan03'))
+    asyncio.run(get_chat_info("seeknrzzz"))
+    # asyncio.run(get_chat_history('testan03'))

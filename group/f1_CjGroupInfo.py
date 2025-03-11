@@ -1,3 +1,5 @@
+import ast
+import json
 import os
 import re
 import sqlite3
@@ -17,7 +19,6 @@ from langdetect import LangDetectException
 from pyrogram import Client
 from pyrogram.enums import ParseMode
 
-
 def query_telegram_data():
     root_dir = os.path.dirname(os.path.dirname(__file__))
     conn = sqlite3.connect(root_dir + '/telegram_data.db')
@@ -33,7 +34,6 @@ def query_telegram_data():
 
     conn.close()
     return data_link
-
 
 def query_telegram_data2():
     root_dir = os.path.dirname(os.path.dirname(__file__))
@@ -51,17 +51,14 @@ def query_telegram_data2():
     conn.close()
     return data_link
 
-
 def importGroup(source):
     data_link = query_telegram_data()
     run(data_link, source)
-
 
 def importGroup2(source):
     # 查询数据 1中文 2英文 0其他 ，没有人员限制
     data_link = query_telegram_data2()
     run(data_link, source)
-
 
 def run(data_link, source):
     row_count = len(data_link)
@@ -114,7 +111,6 @@ def run(data_link, source):
     else:
         print("No data found in the database.")
 
-
 def detect_language(text):
     total_cnt = len(text)
     if total_cnt < 10:
@@ -127,7 +123,6 @@ def detect_language(text):
         # return detect(text)
     except LangDetectException:
         return "unknown"
-
 
 def verify_telegram_urls(url):
     headers = {
@@ -207,7 +202,6 @@ def verify_telegram_urls(url):
         responseContent[url] = {"error": str(e)}
 
     return responseContent, success_count
-
 
 def save_to_sqlite(data, batch_code):
     root_dir = os.path.dirname(os.path.dirname(__file__))
@@ -350,7 +344,6 @@ def save_to_sqlite(data, batch_code):
     conn.close()
     return
 
-
 def insertPromot(langType, promoterId, promoterName, startTime, batchNo, urls):
     # url = "http://localhost:8080/cms/content/importPromot"
     url = "http://a5b684db7f9d746b18f60bbe60781a74-8b898802e7cba134.elb.ap-southeast-1.amazonaws.com:8800/cms/content/importPromot"
@@ -385,7 +378,6 @@ def insertPromot(langType, promoterId, promoterName, startTime, batchNo, urls):
         requests.post(url, headers=headers, json=data_list)
     print(f"{datetime.now()},promot data has been saved")
 
-
 def updatePromot(startTime):
     url = "http://a5b684db7f9d746b18f60bbe60781a74-8b898802e7cba134.elb.ap-southeast-1.amazonaws.com:8800/cms/content/execPromotProc"
     headers = {
@@ -397,7 +389,6 @@ def updatePromot(startTime):
     time.sleep(60 * 30)
     response = requests.post(url, headers=headers, json={"startTime": startTime, "endTime": endTime})
     print(f"{datetime.now()},promot结果:{response.text}")
-
 
 def getWebInfo(urlsAll):
     # 从数据库中删除旧数据
@@ -411,10 +402,10 @@ def getWebInfo(urlsAll):
     urls = list(set(urlsAll))
     total_urls = len(urls)
     if not urls:
-        print("No URLs found in the Excel file.")
+        print("no urls.")
         return
-    else:
-        print(f"去重 URLs read from Excel: {total_urls}")
+    # else:
+    #     print(f"去重 URLs read from Excel: {total_urls}")
 
     # vpn_test_url =urls[0]
     # vpn_results = test_vpn_lines(vpn_test_url)
@@ -450,7 +441,8 @@ def getWebInfo(urlsAll):
 
             end_time = datetime.now()
             duration = end_time - start_time
-            print(f"{end_time},Processed batch {i // batch_size + 1},Successfully retrieved URLs: {success_count},Time taken: {duration}")
+            print(
+                f"{end_time},Processed batch {i // batch_size + 1},Successfully retrieved URLs: {success_count},Time taken: {duration}")
             # time.sleep(1)
 
             # _tc = success_count / 10000
@@ -462,7 +454,6 @@ def getWebInfo(urlsAll):
 
     update_telegram_data()
     return
-
 
 def convert_subscribers(value):
     """将带有 'K' 的字符串转换为整数"""
@@ -484,7 +475,6 @@ def convert_subscribers(value):
             return int(value)
     except:
         return 0
-
 
 def update_telegram_data():
     """更新数据库中的数据"""
@@ -520,7 +510,6 @@ def update_telegram_data():
     conn.commit()
     conn.close()
 
-
 def handUrls(urls):
     total_urls = len(urls)
     urlsAll = []
@@ -543,9 +532,9 @@ def handUrls(urls):
         if '+' in url or not url.startswith("https://t.me/"):
             continue
         urlsAll.append(url)
+    urlsAll = list(set(urlsAll))
     print(f"Total URLs read from Excel: {total_urls},valid:{len(urlsAll)}")
     return urlsAll
-
 
 def excel_import(batchNo, langType, source):
     _dir = os.path.dirname(__file__)
@@ -585,7 +574,6 @@ def excel_import(batchNo, langType, source):
             t.daemon = False
             t.start()
 
-
 def csv_import(source):
     _dir = os.path.dirname(__file__)
     file_path = os.path.join(_dir, 'f1_Cj_url.csv')
@@ -608,6 +596,22 @@ def csv_import(source):
     # insertPromot(2, promoterId, promoterName, startTime, batchNo, urls)
     # importGroup()
     # updatePromot(startTime)
+
+def dir_import(source):
+    _dir = os.path.dirname(__file__) + "/url"
+    files = os.listdir(_dir)
+    for item in files:
+        if '.txt' in item:
+            urls = []
+            try:
+                with open(_dir + '/' + item, 'r', encoding='utf-8') as file:
+                    content = file.read()
+                    urls = ast.literal_eval(content)
+                    urls = handUrls(urls)
+                    getWebInfo(urls)
+                    importGroup2(source)
+            except Exception as e:
+                print(f"Error reading URLs from Excel: {e}")
 
 def sendMsg(msg):
     API_ID = '26534384'
@@ -644,9 +648,10 @@ if __name__ == "__main__":
     conn.commit()
     conn.close()
 
+    dir_import(5)
     # csv_import(5)
     # excel_import("2024101802", 2,6)
-    excel_import(datetime.now().strftime("%Y%m%d"), 2, 6)
+    # excel_import(datetime.now().strftime("%Y%m%d"), 2, 6)
     print(f"{datetime.now()},wait...")
 
     response = requests.get('https://api.ipify.org', timeout=5)
