@@ -360,8 +360,8 @@ def req_api(api, data):
         return []
 
 def getData(size):
-    url = "cms/content/getSupplyGroups"
-    data = {"size": size}
+    url = "cms/content/getEmptyLinks"
+    data = {"pageSize": size}
     lst_data = req_api(url, data)
     urls = []
     for data in lst_data:
