@@ -360,7 +360,7 @@ def req_api(api, data):
         return []
 
 def getData(size):
-    url = "cms/content/getEmptyLinks"
+    url = "cms/content/getSupplyGroups"
     data = {"pageSize": size}
     lst_data = req_api(url, data)
     urls = []
@@ -486,7 +486,7 @@ def sendMsg(msg):
 
 def getEmptyData(size):
     url = "cms/content/getEmptyLinks"
-    data = {"pageSize": size, "source": 5}
+    data = {"pageSize": size, "isMsg":0}
     lst_data = req_api(url, data)
     urls = []
     for data in lst_data:
@@ -579,7 +579,7 @@ def businessCode():
     i = 0
     while i < 20:
         i = i + 1
-        cnt = api_import(i, 500)
+        cnt = empty_import(i, 500)
         if cnt == 0:
             cnt = api_import_msg(i, 500)
             if cnt == 0:
