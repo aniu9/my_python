@@ -219,7 +219,7 @@ def query_delete_data(lstData):
         if (item.get("page_title") is None or item.get("url_type") == "User") and (
                 page_action in ['View Post', 'Send Message', 'Start Bot', 'Join Group'] or
                 "If you have Telegram, you can view postsby" in description or
-                (description == "" and item.get("page_action") == "" and
+                (description == "" and page_action == "" and
                  item.get("action_button") is None and item.get("error") is None)):
             obj = {
                 "url": item.get("url")
