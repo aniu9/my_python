@@ -110,6 +110,51 @@ def toLine():
     fileUtil.write_lst_csv(lstData, 'f0_result.csv', 0)
     print(f'{len(lstData)}')
 
+# 生成 SQL
+def json_to_sql(table_name):
+    with open('f0_result.csv', 'r', encoding='utf-8') as file:
+        json_data = file.read()
+        # 解析 JSON 数据
+        data = json.loads(json_data)
+
+        # 开始构建 SQL 语句
+        sql = f"CREATE TABLE {table_name} (\n"
+
+        # 遍历 JSON 对象的键值对
+        columns = []
+        for key, value in data.items():
+            # 将 JSON 键转换为有效的 SQL 列名
+            column_name = re.sub(r'\W+', '_', key).lower()
+
+            # 根据值类型确定 SQL 数据类型
+            if isinstance(value, int):
+                data_type = "INT"
+            elif isinstance(value, float):
+                data_type = "FLOAT"
+            elif isinstance(value, bool):
+                data_type = "BOOLEAN"
+            elif isinstance(value, str):
+                # 对于字符串，我们假设最大长度为 255
+                data_type = "VARCHAR(255)"
+            elif value is None:
+                data_type = "VARCHAR(255)"
+            else:
+                # 对于复杂类型（如嵌套对象或数组），我们使用 TEXT
+                data_type = "TEXT"
+
+            columns.append(f"    {column_name} {data_type}")
+
+        # 将所有列定义连接起来
+        sql += ",\n".join(columns)
+
+        # 添加主键（这里我们假设第一个字段为主键）
+        first_column = re.sub(r'\W+', '_', list(data.keys())[0]).lower()
+        sql += f",\n    PRIMARY KEY ({first_column})"
+
+        # 结束 SQL 语句
+        sql += "\n);"
+
+        print(sql)
 
 if __name__ == "__main__":
     # file = os.path.join(_cur_dir, 'f0_result.csv')
@@ -117,7 +162,8 @@ if __name__ == "__main__":
     # lstData = df.iloc[:, 0].tolist()
     # urls = list(set(lstData))
     # print(len(urls))
-    toIn()
+    # toIn()
     # toInInt()
     # toUnionSelct('user_id')
     # print(snake_to_camel("h_es_link_index_lang"))
+    json_to_sql('user')
