@@ -1,1 +1,4 @@
-{"user_tg_id":1,"user_tg_name":"","group_tg_id":1,"group_tg_name":"","input_text":"","bot_tg_id":1,"bot_tg_name":"","bs_type":0}
+{
+     "userTgId": 1,
+     "userTgName": "",
+}

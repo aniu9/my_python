@@ -135,9 +135,9 @@ def json_to_sql(table_name):
                 data_type = "BOOLEAN"
             elif isinstance(value, str):
                 # 对于字符串，我们假设最大长度为 255
-                data_type = "VARCHAR(255)"
+                data_type = "VARCHAR(100)"
             elif value is None:
-                data_type = "VARCHAR(255)"
+                data_type = "VARCHAR(100)"
             else:
                 # 对于复杂类型（如嵌套对象或数组），我们使用 TEXT
                 data_type = "TEXT"

@@ -486,7 +486,7 @@ def sendMsg(msg):
 
 def getEmptyData(size):
     url = "cms/content/getEmptyLinks"
-    data = {"pageSize": size, "isMsg":0}
+    data = {"pageSize": size, "isMsg": 0}
     lst_data = req_api(url, data)
     urls = []
     for data in lst_data:
@@ -566,6 +566,7 @@ def updateEmpty(lstData):
 
 def empty_import(i, size):
     urls = getEmptyData(size)
+    # urls = ["https://t.me/ddgeopolitics/134686"]
     if len(urls) == 0:
         return 0
     lstData = getWebInfo(urls, i)
