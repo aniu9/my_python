@@ -4,7 +4,10 @@ import json
 from datetime import datetime, timedelta
 
 import requests
-from pyrogram import Client, errors
+from faststream import broker
+from pyrogram import errors, idle, handlers
+from pyrogram import filters, Client
+from pyrogram.types import Message
 
 # 166 aniu923 阿牛
 API_ID = '26534384'
@@ -184,6 +187,66 @@ def send_msg(msg):
     with get_bot() as bot:
         bot.send_message("cjaniu", msg)
 
+def req_api(api, data):
+    # 正式环境
+    # url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/"
+    # 测试环境
+    # url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/"
+    # 开发环境
+    url = "http://localhost:8090/"
+
+    url = url + api.strip("/")
+    j = json.dumps(data)
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        if response.status_code != 200:
+            print({"error": f"Status code: {response.status_code}"})
+            return []
+        result = json.loads(response.content)
+        if result["code"] != 200:
+            print(f"error: {result}")
+            return []
+        return result["data"]
+    except Exception as ex:
+        print(ex)
+
+bot = Client(TOKEN_NAME, api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+
+
+# @bot.on_message()
+async def handle_home_action(client: Client, msg: Message):
+    print('command')
+    req_api("/gcmgt/test",{"botId":7931792484,"update":msg})
+
+# @Client.on_message()
+async def handle_home_action(client: Client, msg: Message):
+    print('text')
+    req_api("/gcmgt/test",{"botId":7931792484,"update":msg})
+
+# @Client.on_callback_query()
+async def handle_slash_submit(client: Client, msg: Message):
+    print('button')
+    req_api("/gcmgt/test",{"botId":7931792484,"update":msg})
+
+async def main():
+    async with bot:
+        await idle()
+        await bot.stop()
+
 if __name__ == "__main__":
-    asyncio.run(get_chat_info("seeknrzzz"))
+    # asyncio.run(get_chat_info("fq_collect_bot"))
     # asyncio.run(get_chat_history('testan03'))
+    bot.run(main())
+
+customHandlers = [
+    handlers.MessageHandler(
+        callback= handle_home_action
+    ),
+]
+
+for cHandler in customHandlers:
+    bot.add_handler(cHandler)
