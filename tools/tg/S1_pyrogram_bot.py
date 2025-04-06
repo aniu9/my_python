@@ -4,7 +4,6 @@ import json
 from datetime import datetime, timedelta
 
 import requests
-from faststream import broker
 from pyrogram import errors, idle, handlers
 from pyrogram import filters, Client
 from pyrogram.types import Message
@@ -187,16 +186,15 @@ def send_msg(msg):
     with get_bot() as bot:
         bot.send_message("cjaniu", msg)
 
-def req_api(api, data):
+def req_api1(api, data):
     # 正式环境
     # url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service/"
     # 测试环境
     # url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/"
     # 开发环境
     url = "http://localhost:8090/"
-
     url = url + api.strip("/")
-    j = json.dumps(data)
+    # data = json.dumps(data)
     headers = {
         'Content-Type': 'application/json'
     }
@@ -214,13 +212,134 @@ def req_api(api, data):
     except Exception as ex:
         print(ex)
 
+
+from datetime import datetime
+from pyrogram.types import Message, CallbackQuery, User, Chat, MessageEntity, Photo, Document, Audio, Video, Animation, Sticker, Contact, Location, Venue, Poll, Dice, Game
+def map_user(user: User) -> dict:
+    """将 Pyrogram User 转换为 Telegram Bot API 格式"""
+    return {
+        "id": user.id,
+        "is_bot": user.is_bot,
+        "first_name": user.first_name,
+        "last_name": user.last_name or None,
+        "username": user.username or None,
+        "language_code": user.language_code or None
+    } if user else None
+
+def map_chat(chat: Chat) -> dict:
+    """将 Pyrogram Chat 转换为 Telegram Bot API 格式"""
+    return {
+        "id": chat.id,
+        "type": chat.type.value,
+        "title": chat.title or None,
+        "username": chat.username or None,
+        "first_name": chat.first_name or None,
+        "last_name": chat.last_name or None
+    } if chat else None
+
+def map_message_entity(entity: MessageEntity) -> dict:
+    """将 MessageEntity 转换为 Telegram Bot API 格式"""
+    return {
+        "type": entity.type.value,
+        "offset": entity.offset,
+        "length": entity.length,
+        "url": entity.url or None,
+        "user": map_user(entity.user) if entity.user else None,
+        "language": entity.language or None,
+        "custom_emoji_id": entity.custom_emoji_id or None,
+    } if entity else None
+
+def map_photo(photo: Photo) -> dict:
+    """将 Photo 转换为文件字典（仅包含文件ID）"""
+    return {"file_id": photo.file_id} if photo else None
+
+def map_document(doc: Document) -> dict:
+    """将 Document 转换为 Telegram Bot API 格式"""
+    return {
+        "file_id": doc.file_id,
+        "file_name": doc.file_name or None,
+        "mime_type": doc.mime_type or None,
+        "file_size": doc.file_size or None,
+    } if doc else None
+
+def map_message(message: Message) -> dict:
+    """将 Pyrogram Message 转换为 Telegram Bot API 格式"""
+    if not message:
+        return None
+
+    # 基础字段
+    msg_dict = {
+        "message_id": message.id,
+        "from": map_user(message.from_user),
+        "date": int(message.date.timestamp()) if message.date else None,
+        "chat": map_chat(message.chat),
+        "text": message.text or None,
+        "caption": message.caption or None,
+        # "entities": [map_message_entity(e) for e in message.entities] if message.entities else None,
+        "caption_entities": [map_message_entity(e) for e in message.caption_entities] if message.caption_entities else None,
+    }
+
+    # 处理媒体内容
+    if message.photo:
+        msg_dict["photo"] = [map_photo(p) for p in message.photo]
+    elif message.document:
+        msg_dict["document"] = map_document(message.document)
+    elif message.audio:
+        msg_dict["audio"] = {
+            "file_id": message.audio.file_id,
+            "duration": message.audio.duration,
+            "title": message.audio.title or None,
+            "mime_type": message.audio.mime_type or None,
+        }
+    elif message.video:
+        msg_dict["video"] = {
+            "file_id": message.video.file_id,
+            "width": message.video.width,
+            "height": message.video.height,
+            "duration": message.video.duration,
+        }
+    # 其他媒体类型（如 location, poll 等）按需扩展...
+
+    # 处理转发和回复消息
+    if message.forward_from:
+        msg_dict["forward_from"] = map_user(message.forward_from)
+    if message.forward_from_chat:
+        msg_dict["forward_from_chat"] = map_chat(message.forward_from_chat)
+    if message.reply_to_message:
+        msg_dict["reply_to_message"] = map_message(message.reply_to_message)
+
+    return msg_dict
+
+def map_callback_query(callback: CallbackQuery) -> dict:
+    """将 CallbackQuery 转换为 Telegram Bot API 格式"""
+    return {
+        "id": callback.id,
+        "from": map_user(callback.from_user),
+        "message": map_message(callback.message) if callback.message else None,
+        "data": callback.data,
+        "inline_message_id": callback.inline_message_id or None,
+    } if callback else None
+
+def convert_to_telegram_update(message: Message = None, callback: CallbackQuery = None) -> dict:
+    """生成与 Telegram Bot API Update 兼容的 JSON"""
+    update = {}
+    if message:
+        update["message"] = map_message(message)
+    elif callback:
+        update["callback_query"] = map_callback_query(callback)
+    return update
+
 bot = Client(TOKEN_NAME, api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
+@bot.on_message()
+def start_command(client, message:Message):
+    print('client')
+    req_api1("/gcmgt/process",{"botId":7931792484,"update":convert_to_telegram_update(message)})
 
-# @bot.on_message()
-async def handle_home_action(client: Client, msg: Message):
+@bot.on_callback_query()
+async def handle_home_action(client: Client, msg: CallbackQuery):
     print('command')
-    req_api("/gcmgt/test",{"botId":7931792484,"update":msg})
+    req_api1("/gcmgt/process",{"botId":7931792484,"update":convert_to_telegram_update(None,msg)})
 
 # @Client.on_message()
 async def handle_home_action(client: Client, msg: Message):

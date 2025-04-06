@@ -156,6 +156,8 @@ def json_to_sql(table_name):
 
         print(sql)
 
+from tortoise import Tortoise
+
 if __name__ == "__main__":
     # file = os.path.join(_cur_dir, 'f0_result.csv')
     # df = pd.read_csv(file, header=None)
@@ -166,4 +168,5 @@ if __name__ == "__main__":
     # toInInt()
     # toUnionSelct('user_id')
     # print(snake_to_camel("h_es_link_index_lang"))
-    json_to_sql('user')
+    # json_to_sql('user')
+    print(dir(Tortoise))
