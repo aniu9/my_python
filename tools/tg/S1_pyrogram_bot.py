@@ -1,12 +1,10 @@
 import asyncio
 import hashlib
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import requests
-from pyrogram import errors, idle, handlers
-from pyrogram import filters, Client
-from pyrogram.types import Message
+from pyrogram import idle, Client, handlers, errors
 
 # 166 aniu923 阿牛
 API_ID = '26534384'
@@ -95,10 +93,10 @@ def get_app(token_name=None, api_id=None, api_hash=None):
     client = Client(token_name, api_id, api_hash)
     return client
 
-async def get_me_info(client):
-    async with client as cl:
-        chat = await cl.get_me()
-        print(chat)
+async def get_bot_info(token):
+    async with get_bot(token, bot_token=token) as client:
+        bot = await client.get_me()
+        print(f"first_name: {bot.first_name}\nuname: {bot.username}\ntaken: {token}")
 
 async def get_chat_info(chat_id):
     async with get_bot() as bot:
@@ -122,10 +120,22 @@ async def get_chat_history(chat_id):
     # api_hash = '69e29ef1d74a7400f638bd481e8ea084'
     # bot_token = '8096915404:AAHcnrQqmgNYEr8r0OVij5X7dGFcGOwxlaM'
     # token_name = 'cjss_test01_bot'
+    API_ID = 21975583
+    API_HASH = '038ebc70dadb32be863b086e7b1ed93b'
+    BOT_TOKEN = '7442834041:AAGPY8ffSLPajqLx1KN1GiWPB4yWtj9Y9U0'
+    bot = Client("bot1", API_ID, API_HASH, bot_token=BOT_TOKEN)
+    await bot.start()
     async with get_app() as client:
+        # await client.send_message(-1002465447452,"abc")
+        # old_msg = await client.get_messages(-1002406457086, 6)
+        # print(old_msg)
+        # return old_msg
+
         # 获取历史消息
         flag = True
-        while True:
+        i = 1
+        while i == 1:
+            i = i + 1
             flag = False
             now = datetime.now()
             today_start = datetime(now.year, now.month, now.day)
@@ -133,8 +143,10 @@ async def get_chat_history(chat_id):
 
             # 获取昨天的所有消息
             messages = []
-            async for message in client.get_chat_history(chat_id, offset_date=today_start, limit=10):
-                print(message)
+            async for message in client.get_chat_history(chat_id, offset_id=0, limit=2, reverse=False):
+                print(message.id, message.date)
+                # await bot.copy_message(chat_id, chat_id, message_id=message.id)
+                # await bot.copy_media_group(chat_id, chat_id, message_id=message.id)
             # async for message in client.get_chat_history(chat_id, offset_date=today_start):
             #     if yesterday_start <= message.date < today_start:
             #         messages.append(message)
@@ -176,6 +188,8 @@ async def get_chat_history(chat_id):
             #     # 到达频道的开始
             #     break
 
+    await bot.stop()
+
 # async def get_msg_info():
 
 
@@ -212,9 +226,10 @@ def req_api1(api, data):
     except Exception as ex:
         print(ex)
 
-
 from datetime import datetime
-from pyrogram.types import Message, CallbackQuery, User, Chat, MessageEntity, Photo, Document, Audio, Video, Animation, Sticker, Contact, Location, Venue, Poll, Dice, Game
+from pyrogram.types import Message, CallbackQuery, User, Chat, MessageEntity, Photo, Document, InlineKeyboardMarkup, \
+    InlineKeyboardButton
+
 def map_user(user: User) -> dict:
     """将 Pyrogram User 转换为 Telegram Bot API 格式"""
     return {
@@ -276,7 +291,8 @@ def map_message(message: Message) -> dict:
         "text": message.text or None,
         "caption": message.caption or None,
         # "entities": [map_message_entity(e) for e in message.entities] if message.entities else None,
-        "caption_entities": [map_message_entity(e) for e in message.caption_entities] if message.caption_entities else None,
+        "caption_entities": [map_message_entity(e) for e in
+                             message.caption_entities] if message.caption_entities else None,
     }
 
     # 处理媒体内容
@@ -332,40 +348,91 @@ def convert_to_telegram_update(message: Message = None, callback: CallbackQuery 
 bot = Client(TOKEN_NAME, api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
 @bot.on_message()
-def start_command(client, message:Message):
+def start_command(client, message: Message):
     print('client')
-    req_api1("/gcmgt/process",{"botId":7931792484,"update":convert_to_telegram_update(message)})
+    req_api1("/gcmgt/process", {"botId": 7931792484, "update": convert_to_telegram_update(message)})
 
 @bot.on_callback_query()
 async def handle_home_action(client: Client, msg: CallbackQuery):
     print('command')
-    req_api1("/gcmgt/process",{"botId":7931792484,"update":convert_to_telegram_update(None,msg)})
+    req_api1("/gcmgt/process", {"botId": 7931792484, "update": convert_to_telegram_update(None, msg)})
 
 # @Client.on_message()
 async def handle_home_action(client: Client, msg: Message):
     print('text')
-    req_api("/gcmgt/test",{"botId":7931792484,"update":msg})
+    req_api("/gcmgt/test", {"botId": 7931792484, "update": msg})
 
 # @Client.on_callback_query()
 async def handle_slash_submit(client: Client, msg: Message):
     print('button')
-    req_api("/gcmgt/test",{"botId":7931792484,"update":msg})
+    req_api("/gcmgt/test", {"botId": 7931792484, "update": msg})
+
+customHandlers = [
+    handlers.MessageHandler(
+        callback=handle_home_action
+    ),
+]
+
+for cHandler in customHandlers:
+    bot.add_handler(cHandler)
 
 async def main():
     async with bot:
         await idle()
         await bot.stop()
 
+async def reply():
+    async with get_bot() as app:
+        await app.send_message('testan03', "test", reply_to_message_id=29, reply_to_chat_id="rtgokn")
+
+async def get_msg():
+    async with get_bot() as app:
+        old_msg = await app.get_messages("testcl01", 229)
+        print(old_msg)
+
+async def delete_msg():
+    app = Client(TOKEN_NAME, api_id=API_ID, api_hash=API_HASH,
+                 bot_token='6854483464:AAEAIZoirC7URAVajssHby4ZHzox9EduPIM')
+    await app.start()
+    # await app.send_message(-1002189485368, "\u200B\ntest")
+    # await app.get_chat(-1002189485368)
+    await app.delete_messages(-1002232206477, [5317, 5318, 5319, 5320])
+    await app.stop()
+
+async def replay_msg():
+    app = Client(TOKEN_NAME, api_id=API_ID, api_hash=API_HASH,
+                 bot_token=BOT_TOKEN)
+    await app.start()
+    # await app.send_message(-1002189485368, "\u200B\ntest")
+    # await app.get_chat(-1002189485368)
+    await app.send_message("testcl01", "abc", reply_to_message_id=11)
+    await app.stop()
+
+async def edit_message_reply_markup():
+    async with get_bot() as bot:
+        await bot.edit_message_reply_markup(
+            chat_id='testpost88',
+            message_id=63,
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text="test", url="https://t.me/seek")]])
+        )
+
+async def send_message():
+    async with get_bot() as bot:
+        await bot.send_message(chat_id='testcl01', text='test')
+
 if __name__ == "__main__":
-    # asyncio.run(get_chat_info("fq_collect_bot"))
-    # asyncio.run(get_chat_history('testan03'))
-    bot.run(main())
+    # 7869992066:AAE0j_-uSpKlPWVES3a3mqr-yg04-LLAJhE
+    # ,7642211861:AAEkh_wmw1TZ080ymTVuzab0Mifr6oJJ3Mw
+    # ,8150574555:AAEPtjWX-BAPFt69NzJ_ZAlN0bvolRi8_mU
+    # ,8018823188:AAHuLZzZO8nT_0AjE7yOqqD_cTDl_r_wr9M
+    # asyncio.run(send_message())
+    # asyncio.run(get_chat_info(-1003087104593))
+    # asyncio.run(get_chat_history(-1002406457086))
+    # bot.run(main())
+    # asyncio.run(get_bot_info("7244459765:AAHdoCYinQ2GuQTQYtSvaK3Xm37w1mRFoX0"))
+    asyncio.run(get_msg())
+    # asyncio.run(delete_msg())
+    # asyncio.run(replay_msg())
+    # asyncio.run(get_bot_info('8274123427:AAEqlcZj0gPombB_080IpA7OjJhz0f2lGmA'))
+    # asyncio.run(edit_message_reply_markup())
 
-customHandlers = [
-    handlers.MessageHandler(
-        callback= handle_home_action
-    ),
-]
-
-for cHandler in customHandlers:
-    bot.add_handler(cHandler)

@@ -1,0 +1,14 @@
+CREATE TABLE if not exists cms_notice (
+    id BIGINT COMMENT '主键，自增' PRIMARY KEY AUTO_INCREMENT ,
+    plat_type VARCHAR(50) comment '平台类型，job,rental,news,feibo',
+    lang_code  varchar(50)  comment '语言编码',
+    text VARCHAR(1000) COMMENT '通知文本' NOT NULL,
+    notify_type VARCHAR(50) COMMENT '通知类型，Notify，BotUpdate，MKTPromotion'  NOT NULL,
+    notify_target VARCHAR(50) COMMENT '通知目标'  NOT NULL,
+    status VARCHAR(50) COMMENT '状态,Draft，Published，Unpublished，Deleted'  NOT NULL default 0,
+    publish_time DATETIME COMMENT '发布日期',
+    valid_days integer COMMENT '有效天数',
+    create_by VARCHAR(50) COMMENT '创建人',
+    create_time DATETIME COMMENT '创建时间',
+    update_time DATETIME COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通知表';
