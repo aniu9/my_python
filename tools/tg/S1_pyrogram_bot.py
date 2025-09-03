@@ -426,11 +426,11 @@ if __name__ == "__main__":
     # ,8150574555:AAEPtjWX-BAPFt69NzJ_ZAlN0bvolRi8_mU
     # ,8018823188:AAHuLZzZO8nT_0AjE7yOqqD_cTDl_r_wr9M
     # asyncio.run(send_message())
-    # asyncio.run(get_chat_info(-1003087104593))
-    # asyncio.run(get_chat_history(-1002406457086))
+    # asyncio.run(get_chat_info('seeknrzzz'))
+    asyncio.run(get_chat_history('ttestyy0'))
     # bot.run(main())
     # asyncio.run(get_bot_info("7244459765:AAHdoCYinQ2GuQTQYtSvaK3Xm37w1mRFoX0"))
-    asyncio.run(get_msg())
+    # asyncio.run(get_msg())
     # asyncio.run(delete_msg())
     # asyncio.run(replay_msg())
     # asyncio.run(get_bot_info('8274123427:AAEqlcZj0gPombB_080IpA7OjJhz0f2lGmA'))

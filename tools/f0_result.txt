@@ -1,52 +1,17 @@
-
-@Data
-@TableName("cms_notice")
-public class Notice extends BaseEntity {
-
-/**
-* 平台类型，job,rental,news,feibo
-*/
-private String platType;
-
-/**
-* 语言编码
-*/
-private String langCode;
-
-/**
-* 通知文本
-*/
-private String text;
-
-/**
-* 通知类型，Notify，BotUpdate，MKTPromotion
-*/
-private String notifyType;
-
-/**
-* 通知目标
-*/
-private String notifyTarget;
-
-/**
-* 状态,Draft，Published，Unpublished，Deleted
-*/
-private String status;
-
-/**
-* 发布日期
-*/
-@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-private Date publishTime;
-
-/**
-* 有效天数
-*/
-private Integer validDays;
-
-/**
-* 创建人
-*/
-private String createBy;
-
-}
+in(
+3731315,
+3001427,
+2938779,
+8410176,
+9037475,
+9147575,
+9037480,
+9147574,
+9147577,
+3740385,
+6132451,
+9147576,
+3003800,
+1381771,
+3741469
+)

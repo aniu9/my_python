@@ -30,7 +30,7 @@ def toIn():
     fileUtil.write_lst_txt(lstUrl, os.path.join(_cur_dir, 'f0_result.txt'), 1)
 
 def toInInt():
-    file = os.path.join(_cur_dir, 'f0_result.txt')
+    file = os.path.join(_cur_dir, 'f0_source.txt')
     df = pd.read_csv(file, header=None)
     lstData = df.iloc[:, 0].tolist()
     lstUrl = ["in("]
@@ -41,7 +41,8 @@ def toInInt():
             value = str(lstData[i]) + ","
         lstUrl.append(value)
     lstUrl.append(')')
-    fileUtil.write_lst_csv(lstUrl, file, 1)
+    file = os.path.join(_cur_dir, 'f0_result.txt')
+    fileUtil.write_lst_txt(lstUrl, file, 1)
 
 def toUnionSelct(fieldName):
     file = os.path.join(_cur_dir, 'f0_source.csv')
@@ -307,7 +308,7 @@ if __name__ == "__main__":
     # urls = list(set(lstData))
     # print(len(urls))
     # toIn()
-    # toInInt()
+    toInInt()
     # toUnionSelct('user_name')
     # print(snake_to_camel("h_es_link_index_lang"))
     # json_to_sql('user')
@@ -315,4 +316,4 @@ if __name__ == "__main__":
     # to_resultmap()
     # asyncio.run(import_listen())
     # asyncio.run(get_chat_history())
-    remove_url("疼@abc发的https://t.me dabe")
+    # remove_url("疼@abc发的https://t.me dabe")
