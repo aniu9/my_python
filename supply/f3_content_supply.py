@@ -236,7 +236,8 @@ def updateGroup(lstData):
     }
     # 查询数据
     data_link = query_telegram_data(lstData)
-    data_del = query_delete_data(lstData)
+    # data_del = query_delete_data(lstData)
+    data_del = []
     row_count = len(data_del)
     # print(f"Found {row_count} rows in the database.")
     data_list = []
@@ -408,7 +409,8 @@ def update_msg(lstData):
         "Content-Type": "application/json"
     }
     # 查询数据
-    data_del = query_delete_data_msg(lstData)
+    # data_del = query_delete_data_msg(lstData)
+    data_del = []
     data_link = query_telegram_data_msg(lstData)
     row_count = len(data_del)
     data_list = []

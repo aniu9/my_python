@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import asyncio
 import json
 import requests
 
-from tools.test import sendHeaderGenerate
+from tools.util.sign import sendHeaderGenerate
 
 # 目标 API 地址（请替换为你的实际 URL）
 url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/botmng-service/cms/filter/importFilter"

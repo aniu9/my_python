@@ -107,6 +107,7 @@ async def get_chat_info(chat_id):
             print(f"Chat Title: {chat.title}")
             print(f"Chat Username: {chat.username}")
             print(f"Chat Type: {chat.type}")
+            print(f"User Num: {chat.members_count}")
             # print(chat)
         except errors.FloodWait as e:
             print(f"Rate limit exceeded. Waiting for {e.x} seconds.")
@@ -420,19 +421,90 @@ async def send_message():
     async with get_bot() as bot:
         await bot.send_message(chat_id='testcl01', text='test')
 
+async def collect_message(chat_id):
+    async with get_app() as client:
+        count = 0
+        data = []
+        async for message in client.get_chat_history(chat_id, offset_id=0, reverse=False):
+            print(message.id, message.date)
+            count = count + 1
+            data.append({
+                "url": f"https://t.me/{message.chat.username}",
+                "linkType": 1,
+                "status": 1,
+                "telegramId": message.chat.id,
+                "source": 0,
+                "msg": {
+                    "url": f"https://t.me/{message.chat.username}/{message.id}",
+                    "text": message.text,
+                    "linkType": getLinkType(message),
+                }
+            })
+            if count % 20 == 0:
+                await post_cms_message(data)
+                data = []
+                await asyncio.sleep(1)
+        if len(data) > 0:
+            await post_cms_message(data)
+
+def getLinkType(msg: Message):
+    # 2- Vedio视频消息 3- Photo图片消息 4- Text文本消息 5- Audio音乐消息 6- File文件消息
+    linkType = 4
+    if msg.video:
+        linkType = 2
+    if msg.photo:
+        linkType = 3
+    if msg.audio:
+        linkType = 5
+    if msg.document:
+        linkType = 6
+    return linkType
+
+async def post_cms_message(data):
+    # 正式环境
+    url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service"
+    # 测试环境
+    # url = "http://a901c69ff2d4c4b9bb678f3ebc6ea4c1-a52e4692b9f44640.elb.ap-southeast-1.amazonaws.com:8800/"
+
+    url = url + '/cms/content/collect'
+    now = datetime.now()
+    timestamp = int(now.timestamp() * 1000)
+    j = json.dumps(data)
+    SERVER_APP_KEY = "1"
+    s = sign(str(SERVER_APP_KEY), timestamp, j)
+    headers = {
+        'Content-Type': 'application/json',
+        "appkey": str(SERVER_APP_KEY),
+        "timestamp": str(timestamp),
+        "sign": s
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        if response.status_code != 200:
+            print({"error": f"Status code: {response.status_code}"})
+            return []
+        result = json.loads(response.content)
+        if result["code"] != 200:
+            print(f"error: {result}")
+            return []
+        return result["data"]
+    except:
+        return []
+
 if __name__ == "__main__":
     # 7869992066:AAE0j_-uSpKlPWVES3a3mqr-yg04-LLAJhE
     # ,7642211861:AAEkh_wmw1TZ080ymTVuzab0Mifr6oJJ3Mw
     # ,8150574555:AAEPtjWX-BAPFt69NzJ_ZAlN0bvolRi8_mU
     # ,8018823188:AAHuLZzZO8nT_0AjE7yOqqD_cTDl_r_wr9M
     # asyncio.run(send_message())
-    # asyncio.run(get_chat_info('seeknrzzz'))
-    asyncio.run(get_chat_history('ttestyy0'))
+    asyncio.run(get_chat_info('cjtestchanel1'))
+    # asyncio.run(get_chat_history('cjtestchanel'))
+    # asyncio.run(collect_message('hwsj'))
     # bot.run(main())
-    # asyncio.run(get_bot_info("7244459765:AAHdoCYinQ2GuQTQYtSvaK3Xm37w1mRFoX0"))
+    # asyncio.run(get_bot_info("7847701862:AAEPzKbHo68dLdYdBmq4VofTTF26FPu0US0"))
     # asyncio.run(get_msg())
     # asyncio.run(delete_msg())
     # asyncio.run(replay_msg())
     # asyncio.run(get_bot_info('8274123427:AAEqlcZj0gPombB_080IpA7OjJhz0f2lGmA'))
     # asyncio.run(edit_message_reply_markup())
-

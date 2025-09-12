@@ -4,7 +4,7 @@ import os
 from telethon import TelegramClient
 from telethon.tl.functions.messages import GetHistoryRequest
 
-# 166 cobb923 阿牛
+# 166 aniu923 阿牛
 api_id = '26534384'
 api_hash = '8c32b586b4c83b04b9ab7d50c6464907'
 # cjss_my_bot 超级阿牛

@@ -9,7 +9,7 @@ from telethon import TelegramClient, events
 from telethon.tl.functions.messages import GetHistoryRequest
 from telethon.tl.functions.users import GetFullUserRequest
 
-# 166 cobb923 fq_collect_bot
+# 166 aniu923 fq_collect_bot
 api_id = '26534384'
 api_hash = '8c32b586b4c83b04b9ab7d50c6464907'
 bot_token = '7931792484:AAEX1QM7483FqCpcRvwFBEdbr2_Hb6uWp5s'

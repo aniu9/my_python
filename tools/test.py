@@ -1,62 +1,40 @@
 import asyncio
-import hashlib
-import json
-from datetime import datetime
+from pyrogram import Client
+from pyrogram.types import ChatPrivileges
 
-import requests
+API_ID = '26534384'
+API_HASH = '8c32b586b4c83b04b9ab7d50c6464907'
 
-def md5_hash(input_str):
-    md5 = hashlib.md5()
-    # Ensure the string is encoded to bytes before hashing
-    md5.update(input_str.encode('utf-8'))
-    return md5.hexdigest()
+TOKEN_NAME = 'fq_collect_bot'
+BOT_TOKEN = '7931792484:AAEX1QM7483FqCpcRvwFBEdbr2_Hb6uWp5s'
 
+async def add(chat_id, target_id):
+    async with Client('client_session', API_ID, API_HASH, bot_token=BOT_TOKEN) as client:
+        await client.add_chat_members(chat_id, target_id)
+    print(1)
 
-def get_secret(app_key):
-    # Mimicking the SignStringUtils.left and right functions from Java
-    hash_key = md5_hash("key" + app_key)
-    return hash_key[:15][-10:]
+async def promote(chat_id, target_id):
+    # await add(chat_id, target_id)
+    privileges = ChatPrivileges(
+        can_manage_chat=True,  # 基本聊天管理（必需）
+        can_delete_messages=True,  # 删除消息
+        can_manage_video_chats=True,  # 管理视频聊天（会议）
+        can_restrict_members=True,  # 禁言/封禁成员
+        can_promote_members=True,  # 提升其他成员（谨慎授予！）
+        can_change_info=True,  # 更改聊天信息
+        can_post_messages=True,  # 在频道发帖（如果是频道）
+        can_edit_messages=True,  # 编辑消息（如果是频道）
+        can_invite_users=True,  # 邀请用户
+        can_pin_messages=True,  # 置顶消息
+        is_anonymous=False  # 匿名操作（仅限超级群组）
+    )
 
-
-def sign(app_key, timestamp, request_body):
-    try:
-        secret = get_secret(app_key)
-        sb_sign = app_key + secret + str(timestamp) + request_body
-        # Hash the concatenated string and convert to uppercase
-        sign_result = md5_hash(sb_sign).upper()
-        return sign_result
-    except Exception as e:
-        print(f"生成签名异常: {e}")
-        return None
-
-
-def sendHeaderGenerate(data):
-    # 暂时固定给的都是1
-    SERVER_APP_KEY = "2"
-    now = datetime.now()
-    # 将 datetime 对象转换为时间戳
-    timestamp = int(now.timestamp() * 1000)
-    # body参数
-    j = json.dumps(data)
-    s = sign(str(SERVER_APP_KEY), timestamp, j)
-    headers = {
-        'Content-Type': 'application/json',
-        "appkey": str(SERVER_APP_KEY),
-        "timestamp": str(timestamp),
-        "sign": s
-    }
-    return headers
-
-async def request():
-    url = 'http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/botmng-service/cms/filter/getFilters'
-    # url = 'http://localhost:8083/botmng-service/cms/filter/getFilters'
-    params={
-        "platType": "feibo",
-        "langCode": "zh-cn"
-    }
-    headers = sendHeaderGenerate(params)
-    response = requests.post(url, json=params, headers=headers)
-    print(response.text)
+    async with Client('client_session', API_ID, API_HASH, bot_token=BOT_TOKEN) as client:
+        await client.promote_chat_member(
+            chat_id=chat_id,
+            user_id=target_id,
+            privileges=privileges
+        )
 
 if __name__ == "__main__":
-    asyncio.run(request())
+    asyncio.run(promote('cjtestchanel', 'aniu923'))
