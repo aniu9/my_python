@@ -498,11 +498,11 @@ if __name__ == "__main__":
     # ,8150574555:AAEPtjWX-BAPFt69NzJ_ZAlN0bvolRi8_mU
     # ,8018823188:AAHuLZzZO8nT_0AjE7yOqqD_cTDl_r_wr9M
     # asyncio.run(send_message())
-    asyncio.run(get_chat_info('cjtestchanel1'))
+    asyncio.run(get_chat_info('testan02'))
     # asyncio.run(get_chat_history('cjtestchanel'))
     # asyncio.run(collect_message('hwsj'))
     # bot.run(main())
-    # asyncio.run(get_bot_info("7847701862:AAEPzKbHo68dLdYdBmq4VofTTF26FPu0US0"))
+    # asyncio.run(get_bot_info("8174398578:AAGaPOnPNUP6Cuq30dN7J0SpVP7EKXADWZ4"))
     # asyncio.run(get_msg())
     # asyncio.run(delete_msg())
     # asyncio.run(replay_msg())
