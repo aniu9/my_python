@@ -1,10 +1,15 @@
 import asyncio
 import hashlib
 import json
-from datetime import timedelta
+import re
+import time
+from datetime import timedelta, date
 
 import requests
-from pyrogram import idle, Client, handlers, errors
+from pyrogram import idle, Client, handlers, errors, enums
+from pytz import timezone
+
+from tools.util import file_util
 
 # 166 aniu923 阿牛
 API_ID = '26534384'
@@ -421,31 +426,48 @@ async def send_message():
     async with get_bot() as bot:
         await bot.send_message(chat_id='testcl01', text='test')
 
-async def collect_message(chat_id):
-    async with get_app() as client:
-        count = 0
-        data = []
-        async for message in client.get_chat_history(chat_id, offset_id=0, reverse=False):
-            print(message.id, message.date)
-            count = count + 1
-            data.append({
-                "url": f"https://t.me/{message.chat.username}",
-                "linkType": 1,
-                "status": 1,
-                "telegramId": message.chat.id,
-                "source": 0,
-                "msg": {
-                    "url": f"https://t.me/{message.chat.username}/{message.id}",
-                    "text": message.text,
-                    "linkType": getLinkType(message),
-                }
-            })
-            if count % 20 == 0:
+async def collect_message(chat_ids):
+    chat_ids = chat_ids.split(',')
+    for chat_id in chat_ids:
+        async with get_app() as client:
+            count = 0
+            data = []
+            date = datetime.today().now().date() - timedelta(days=1)
+            async for message in client.get_chat_history(chat_id, reverse=False):
+                print(chat_id, message.id, message.date)
+                if message.date.date() < date:
+                    break
+                count = count + 1
+                tz = timezone('Asia/Shanghai')
+                local_time = message.date.astimezone(tz)
+                msgdate = local_time.strftime("%Y-%m-%d %H:%M:%S")
+                text = message.text or message.caption
+                if not text:
+                    continue
+                if message.chat.username == 'hwcg':
+                    text = text.split('\n')[0]
+                    encoded = text.encode('utf-8')[:45]
+                    # 忽略不完整的UTF-8字符
+                    text = encoded.decode('utf-8', 'ignore')
+                data.append({
+                    "url": f"https://t.me/{message.chat.username}",
+                    "linkType": 1,
+                    "status": 1,
+                    "telegramId": message.chat.id,
+                    "source": 0,
+                    "msg": {
+                        "url": f"https://t.me/{message.chat.username}/{message.id}",
+                        "text": text,
+                        "linkType": getLinkType(message),
+                        "publishTime": message.date.strftime('%Y-%m-%d %H:%M:%S')
+                    }
+                })
+                if count % 20 == 0:
+                    await post_cms_message(data)
+                    data = []
+                    await asyncio.sleep(5)
+            if len(data) > 0:
                 await post_cms_message(data)
-                data = []
-                await asyncio.sleep(1)
-        if len(data) > 0:
-            await post_cms_message(data)
 
 def getLinkType(msg: Message):
     # 2- Vedio视频消息 3- Photo图片消息 4- Text文本消息 5- Audio音乐消息 6- File文件消息
@@ -492,15 +514,140 @@ async def post_cms_message(data):
     except:
         return []
 
+async def main2():
+    urls = file_util.read_first_csv(file_util.get_run_path_file("group_url.csv"))
+    print(f"Len {len(urls)} to verify....")
+    cmsPayloads = []
+    bot_tokens = ['8233763050:AAEpI5wmk_iGgVRqxHm0PKIlj60k6BfdfDQ',
+                  '7480786871:AAGocBV8ne1jli8HXzlC931rIj1CunpUhgg',
+                  '7578200869:AAGYOb4_k3LiYDEymY8FfK_X2spdnOw0DAI',
+                  '8096915404:AAHcnrQqmgNYEr8r0OVij5X7dGFcGOwxlaM',
+                  '8081129756:AAHtoZ3s4lrP5u9Zf5tp2UNpVkGSXFZokqQ',
+                  '7815275035:AAG3EPj39IommOSpS6AW_uNEcYH3uRGwJcs',
+                  '7636152888:AAHj1w2GgOhSAA6WXeSjtdZFwj9e054s6xM',
+                  '7761635217:AAGUWbkE2DhitbmHlO8yrmy8iN821v7epQc',
+                  '7908663209:AAGC4CVFr5NRio9mOP8tQfqqaorirhPzzT0',
+                  '7781291686:AAH3L0XGwzkhtJvyeJzhC-Dy2D71NVu-a3k',
+                  '7491446987:AAE7EJbnNKZJ8vPWAUSeE3VbUoaS2EGCShc',
+                  '8083490646:AAHR-gDwND7RHdsdrgsaeYbr6u5rSwdk-Fo',
+                  '7623740381:AAEvJe8J3aaQQDcs7lZ-mGjR6dPKpmbrY0A',
+                  '7628212809:AAHchf6SynOtcMxTu1H3x76AJ75qOfGsJM8',
+                  '7514567164:AAFs9eEi8l7SwLtao7FnKtVyp4jnM5YBP7E',
+                  '7639140436:AAFtftlffnWMT2PhQYbUbowf3MWCGJzJlEw',
+                  '7421747425:AAGPnduuFE_ObGioI8zig9zzzb_Zq_9fh98',
+                  '7523917878:AAEiwdcp4ErBYvUAJGkfkBcLzBGuJxW0c5k',
+                  '7683228049:AAHEAcX4HP7LS-4-XkSsg2Ayz3ux5aFw7Bo',
+                  '7730100615:AAENhqpbUZ71dxvjqiT1mwV4aYEe2_lWIWQ',
+                  '7656464463:AAGuLTdATw82p5Sgi9ReNLsHcKJd_CjxIlA',
+                  '7684315801:AAEZaA4JSc0vqzyj7oYlZPypAQKntDnvZ-U',
+                  '8058289985:AAGHWd7NEuTFOnUlm3j87qV4vuSQy701uYM',
+                  '7982066389:AAEP4utuXiwqyX9ckRbxfrhVKHTBPO3QPPs',
+                  '8008813160:AAH7sRk1CLIYrVpyD5a_Rvt0c56F6_JToJc',
+                  '7955910599:AAGd516_70m6s3btQDmvGm3j5epT5bNFYN0',
+                  '7522630536:AAF_Rg5FDc-v-Yue8jXWKFKGDrUDJyJ1GQY',
+                  '7660194863:AAF3Q758I9nYOqEDQ8xPVFlDajiTD8Mrhvc',
+                  '8071671895:AAEtQNy5eWxlNhDB4LErNXpUKQAMlszc6cY',
+                  '7749326865:AAGxHrNdMWesBZjRJmsBLVvYlWwXYBk-BF4',
+                  '7768370445:AAGb4bPl6ZbNgCVn1YLS9dvEhH6d91gefzA',
+                  '8015829310:AAEVRYcLZQA_rGrXMRPx-jgqZoDMkgchXng',
+                  '7563281423:AAFFnpsJQRTh611sHw9rvH1sYr6uSNhicpE',
+                  '7790147577:AAH2kSx4cu90vAKOe6BaeZa5LGyMg9sROUE',
+                  '7374540154:AAENqpVJ8Je-96oWy3yYtzDoP7YZZK2hUqE',
+                  '7758866458:AAFiqUfNLcX4f0lnGYf3TA5y5a7n0kCDLFo',
+                  '7855095109:AAGm6SYGYD6uIFXrgxBz4MzjDonHojMztQw',
+                  '7926115352:AAF02eTX0NvtLe9d_BmzYQQi9-9G-fc8ywc',
+                  '7928713177:AAHhVU1URWDrJcCbc-gFPOcANkej0NvYtVg',
+                  '7730729867:AAFC3ew6FnBgKrr25aHT3F4F16EBhkqGsYA',
+                  '7999593657:AAG700aXejuQ6W9-9U70J3KUh_AfXDOIHjU',
+                  '7689969798:AAF82-2xWaP3M-p1biOKcYrO5A2w9truz0Q',
+                  '7608158540:AAG4mHYnuBIoJC3p-nB4Khv1_yQZQliFWVc',
+                  '8117863460:AAGrQt0yc-FmQEcrmjeqwZTY8v3A3Jtm-og']
+    bot_index = 0
+    client = None
+    ind = 0
+    while ind < len(urls):
+        url = urls[ind]
+        ind = ind + 1
+        pattern = r'https:\/\/t.me\/(.*)'
+        matching = re.match(pattern=pattern, string=url)
+        if not matching: continue
+        username = matching.groups()[0]
+        try:
+            if client is None or ind % 20 == 0:
+                if client:
+                    await client.stop()
+                bot_token = bot_tokens[bot_index]
+                bot_index = bot_index + 1;
+                if bot_index == 43:
+                    bot_index = 0
+                client = Client(bot_token, api_id=API_ID, api_hash=API_HASH, bot_token=bot_token)
+                await client.start()
+            cmsPayloads = []
+            print(f"Fetching: {username} of {ind}/{len(urls)}, bot: {bot_index}")
+            chat = await client.get_chat(username, force_full=True)
+            if chat.type == enums.ChatType.CHANNEL:
+                chat_type = 1
+            elif chat.type == enums.ChatType.GROUP or chat.type == enums.ChatType.SUPERGROUP:
+                chat_type = 0
+            else:
+                raise ValueError(f"Not a group or channel url: {url}")
+            cmsPayloads.append({
+                "isValid": 1,  # 0 无效 1有效
+                "url": url,
+                "tgId": chat.id,
+                "linkType": chat_type,
+                "userNum": chat.members_count,
+                "userName": chat.username or '',
+                "title": chat.title,
+                "description": chat.description or '',
+                "isIOS": 1 if chat.is_restricted else 0
+            })
+        except (errors.PeerIdInvalid, errors.UsernameNotOccupied, ValueError) as e:
+            cmsPayloads.append({
+                "isValid": 0,  # 0 无效 1有效
+                "url": url,
+            })
+        except Exception as e:
+            if 'FLOOD_WAIT' in str(e):
+                ind = ind - 1
+                print('FLOOD_WAIT:' + str(e))
+                if client:
+                    await client.stop()
+                bot_token = bot_tokens[bot_index]
+                bot_index = bot_index + 1;
+                if bot_index == 43:
+                    bot_index = 0
+                client = Client(bot_token, api_id=API_ID, api_hash=API_HASH, bot_token=bot_token)
+                await client.start()
+            else:
+                print(str(e))
+        if len(cmsPayloads) > 0:
+            url = "http://a276b8d3ca3a14befa1dc6335eaa47ea-f83cb44aa303c283.elb.ap-southeast-1.amazonaws.com:8800/cms-service"
+            url = url + '/cms/content/collectGroupInfo'
+            headers = {"Content-Type": "application/json", "gateway_internal_request_flag": "dhasjkdhaskgvhcbxahsa"}
+
+            try:
+                response = requests.post(url, headers=headers, json=cmsPayloads, timeout=30)
+                if response.status_code != 200:
+                    print({"error": f"Status code: {response.status_code}"})
+                result = json.loads(response.content)
+                if result["code"] != 200:
+                    print(f"error: {result}")
+            except Exception as e:
+                print(str(e))
+        time.sleep(1)
+
 if __name__ == "__main__":
     # 7869992066:AAE0j_-uSpKlPWVES3a3mqr-yg04-LLAJhE
     # ,7642211861:AAEkh_wmw1TZ080ymTVuzab0Mifr6oJJ3Mw
     # ,8150574555:AAEPtjWX-BAPFt69NzJ_ZAlN0bvolRi8_mU
     # ,8018823188:AAHuLZzZO8nT_0AjE7yOqqD_cTDl_r_wr9M
     # asyncio.run(send_message())
-    asyncio.run(get_chat_info('testan02'))
-    # asyncio.run(get_chat_history('cjtestchanel'))
-    # asyncio.run(collect_message('hwsj'))
+    # asyncio.run(get_chat_info('seeknrzzz'))
+    # asyncio.run(get_chat_history('hwcg'))
+    # asyncio.run(collect_message('hwcg'))
+    # asyncio.run(collect_message('hwcg,hwnr8,hwsj'))
+    # asyncio.run(collect_message('rbshangpian,spjiaoliu,gcjxvdo,jhsavscj,dyywvdo,mdgcthjq,onlyfs_sm,chiguahiliao,rqfanchab,tyhjluanlun'))
     # bot.run(main())
     # asyncio.run(get_bot_info("8174398578:AAGaPOnPNUP6Cuq30dN7J0SpVP7EKXADWZ4"))
     # asyncio.run(get_msg())
@@ -508,3 +655,4 @@ if __name__ == "__main__":
     # asyncio.run(replay_msg())
     # asyncio.run(get_bot_info('8274123427:AAEqlcZj0gPombB_080IpA7OjJhz0f2lGmA'))
     # asyncio.run(edit_message_reply_markup())
+    asyncio.run(main2())
