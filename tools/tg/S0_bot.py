@@ -19,6 +19,7 @@ bot_token = '7931792484:AAEX1QM7483FqCpcRvwFBEdbr2_Hb6uWp5s'
 # CJSS_AlarmBot 6854483464:AAEAIZoirC7URAVajssHby4ZHzox9EduPIM
 
 # chaojianiu 超级阿牛
+# hw_test01_bot 8233763050:AAEpI5wmk_iGgVRqxHm0PKIlj60k6BfdfDQ
 # cjss_my_bot 7480786871:AAGocBV8ne1jli8HXzlC931rIj1CunpUhgg
 # cjss_cj_bot 7578200869:AAGYOb4_k3LiYDEymY8FfK_X2spdnOw0DAI
 # cjss_test01_bot 8096915404:AAHcnrQqmgNYEr8r0OVij5X7dGFcGOwxlaM
